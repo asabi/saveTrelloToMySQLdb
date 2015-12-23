@@ -1,0 +1,13 @@
+<?php
+
+$servername = "";
+$username = "";
+$password = "";
+$dbname = "";
+
+// Simple key and token
+
+$key = '';
+$token = '';
+
+$cardsLimit = 1000;
