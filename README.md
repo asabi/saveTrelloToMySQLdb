@@ -65,6 +65,7 @@ SELECT 'Deferred Tickets:', count(card.id) FROM card INNER JOIN list ON list.id 
 </code>
 
 ##AVG Cards added by day of the week:
+
 <code>
 SELECT DATE_FORMAT(weekDay,'%W'), ROUND(AVG(addedCards),0) AS avgCompletedCards FROM (
 SELECT DATE_FORMAT(card.`timeCreated`,'%Y-%m-%d') AS weekDay , count(card.id) as addedCards from card
@@ -73,8 +74,11 @@ GROUP BY DATE_FORMAT(`timeCreated`,'%Y-%m-%d')
 GROUP BY DATE_FORMAT(weekDay,'%W')
 ORDER BY FIELD(DATE_FORMAT(weekDay,'%W'),'Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday')
 </code>
+
 ##AVG cards completed / day of the week (most efficient / less efficient):
+
 - Note: Assumes that completed cards are moved to a "Done" list before they get archived.
+
 <code>
 SELECT DATE_FORMAT(weekDay,'%W'), ROUND(AVG(completedCards),0) AS avgCompletedCards FROM (
 Select DATE_FORMAT(`dateLastActivity`,'%Y-%m-%d') AS weekDay , count(card.id) as completedCards from card
@@ -86,21 +90,23 @@ ORDER BY FIELD(DATE_FORMAT(weekDay,'%W'),'Saturday','Sunday','Monday','Tuesday',
 </code>
 
 ##AVG days to close cards by year/month:
+
 <code>
 SELECT DATE_FORMAT(card.timeCreated,'%Y %M') AS monthYear, AVG(DATEDIFF(card.`dateLastActivity`,card.timeCreated)) AS avgDaysToClose FROM card
 INNER JOIN list ON list.id = card.`idList`
 WHERE list.name = 'Done'
 GROUP BY DATE_FORMAT(card.timeCreated,'%Y %M')
-<code>
+</code>
 
 ##AVG days to close cards:
+
 <code>
 SELECT
     AVG(DATEDIFF(card.`dateLastActivity`,card.timeCreated)) AS avgDaysToClose
 FROM card
 INNER JOIN list ON list.id = card.`idList`
 WHERE list.name = 'Done'
-<code>
+</code>
 
 #Assumptions for queries that involve projects:
 
@@ -119,6 +125,7 @@ ORDER BY label.name;
 </code>
 
 ##List of projects by last activity compared to when they were created:
+
 <code>
 SELECT DATEDIFF(max(card.`dateLastActivity`), min(card.timeCreated)) AS lastDay, card.name, label.`name` FROM `card`
 INNER JOIN label ON card.labels LIKE CONCAT('%',label.name,'%')
@@ -128,6 +135,7 @@ ORDER BY DATEDIFF(max(card.`dateLastActivity`), min(card.timeCreated)) DESC;
 </code>
 
 ##Projects by inactive days and days opened and number of open tickets:
+
 <code>
 SELECT
     count(card.id) - 1 AS tickets,
