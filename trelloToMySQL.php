@@ -1,6 +1,7 @@
 <?php
 require __DIR__ . '/vendor/autoload.php';
 date_default_timezone_set('America/Vancouver');
+error_reporting(0);
 
 use \Trello\Trello;
 
