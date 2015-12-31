@@ -130,14 +130,6 @@ function saveAllCards($trello, $conn, $board, $cardOptions) {
 
       $cards = $trello->get('boards/'.$board->id.'/cards', $cardOptions);
 
-
-      if ($board->id === '56458350c739ebdd30e5f058') {
-        //echo 'Processing:'.sizeof($cards)." cards in {$board->name}\n";
-        echo ' Last: '.$cards[$cardOptions['limit'] - 1]->id.' - First: '.$cards[0]->id."\n";
-
-        //print_r($cards);
-      }
-
       // We will continue to pull cards as long as there are more than the limit
       // The first pass has to happen though.
       $continue = true;
@@ -157,16 +149,6 @@ function saveAllCards($trello, $conn, $board, $cardOptions) {
 
             $cardOptions['before'] = $lastCardIdInFoundSet;
             $cards = $trello->get('boards/'.$board->id.'/cards', $cardOptions);
-
-            if ($board->id === '56458350c739ebdd30e5f058') {
-              echo "-----------------------------------------------------\n";
-              //print_r($cards);
-              //echo 'Processing:'.sizeof($cards)." cards in {$board->name}\n";
-              echo 'Last: '.$cards[$cardOptions['limit'] - 1]->id.' - First: '.$cards[0]->id."\n";
-
-              //print_r($cards);
-            }
-
         }
       }
 
