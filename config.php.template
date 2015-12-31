@@ -1,13 +1,15 @@
 <?php
 
+// MySQL Credentials
+
 $servername = "";
 $username = "";
 $password = "";
 $dbname = "";
 
-// Simple key and token
+// Key and token to Trello (https://developers.trello.com/get-started)
 
 $key = '';
 $token = '';
 
-$cardsLimit = 1000;
+$cardsLimit = 100;
