@@ -48,34 +48,7 @@ foreach ($me->idBoards as $boardId) {
       $lists = $trello->get('boards/'.$boardId.'/lists',$listOptions);
       saveLists($lists, $conn);
 
-      $cards = $trello->get('boards/'.$boardId.'/cards', $cardOptions);
-
-      $continue = true;
-
-      echo 'Processing:'.sizeof($cards)." cards in {$board->name}\n";
-      //saveCards($cards, $conn);
-      while ($continue) {
-
-        $cardsToKeepFromSave = saveCards($cards, $conn);
-
-        if ($cardsToKeepFromSave!= '') {
-          $cardsToKeep.= empty($cardsToKeep)? $cardsToKeepFromSave:','.$cardsToKeepFromSave;
-        }
-
-        if (sizeof($cards) < $cardsLimit) {
-            $continue = false;
-        } else {
-            $lastCardCreationDate = date('c', hexdec( substr( $cards[$cardsLimit - 1]->id  , 0, 8 ) ) );
-            $dateObj = new DateTime($lastCardCreationDate);
-
-            $lastCard = str_replace('--','T',$dateObj->format('Y-m-d--H:i:s'));
-
-          //  echo $lastCard->id. ' -- '.$lastCard."\n";
-            $cardOptions['since'] = $lastCard;
-            $cards = $trello->get('boards/'.$boardId.'/cards', $cardOptions);
-        }
-      }
-
+      saveAllCards($trello, $conn, $board, $cardOptions);
 
 }
 
@@ -143,7 +116,64 @@ function saveLists($lists, $conn) {
   $stmt->close();
 }
 
-function saveCards($cards, $conn) {
+/*
+   Boards are limited to a 1000 max per request. We need to grab them
+   using pagngination.
+
+   Returns a string with comma delimited card id's to keep (we remove any card
+   that was deleted from Trello - not simply archived but completely deleted)
+
+   @return string
+*/
+function saveAllCards($trello, $conn, $board, $cardOptions) {
+
+      $cards = $trello->get('boards/'.$board->id.'/cards', $cardOptions);
+
+
+      if ($board->id === '56458350c739ebdd30e5f058') {
+        //echo 'Processing:'.sizeof($cards)." cards in {$board->name}\n";
+        echo ' Last: '.$cards[$cardOptions['limit'] - 1]->id.' - First: '.$cards[0]->id."\n";
+
+        //print_r($cards);
+      }
+
+      // We will continue to pull cards as long as there are more than the limit
+      // The first pass has to happen though.
+      $continue = true;
+
+      while ($continue) {
+        $cardsToKeepFromSave = saveFoundCards($cards, $conn);
+
+        if ($cardsToKeepFromSave!= '') {
+          $cardsToKeep.= empty($cardsToKeep)? $cardsToKeepFromSave:','.$cardsToKeepFromSave;
+        }
+
+        // If the number of cards found is less than the limit, then we do can stop.
+        if (sizeof($cards) < $cardOptions['limit']) {
+            $continue = false;
+        } else {
+            $lastCardIdInFoundSet = $cards[0]->id;
+
+            $cardOptions['before'] = $lastCardIdInFoundSet;
+            $cards = $trello->get('boards/'.$board->id.'/cards', $cardOptions);
+
+            if ($board->id === '56458350c739ebdd30e5f058') {
+              echo "-----------------------------------------------------\n";
+              //print_r($cards);
+              //echo 'Processing:'.sizeof($cards)." cards in {$board->name}\n";
+              echo 'Last: '.$cards[$cardOptions['limit'] - 1]->id.' - First: '.$cards[0]->id."\n";
+
+              //print_r($cards);
+            }
+
+        }
+      }
+
+      return $cardsToKeep;
+
+}
+
+function saveFoundCards($cards, $conn) {
   //id,closed, idBoard, name,pos, shortUrl,due,dateLastActivity,desc,idList,labels
   $cardsToKeep = '';
   $stmt = $conn->prepare("REPLACE INTO card (id, closed, idBoard, name, pos,shortUrl,due,dateLastActivity,`desc`, idList,labels, timeCreated) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?)");
