@@ -39,6 +39,7 @@ $listOptions['fields'] = 'closed,idBoard,name,pos';
 
 $me = $trello->members->get('me',$boardsOptions);
 
+$partialCardsToKeep = '';
 
 foreach ($me->idBoards as $boardId) {
       $board = $trello->boards->get($boardId);
@@ -49,8 +50,10 @@ foreach ($me->idBoards as $boardId) {
       $lists = $trello->get('boards/'.$boardId.'/lists',$listOptions);
       saveLists($lists, $conn);
 
-      saveAllCards($trello, $conn, $board, $cardOptions);
 
+      $partialCardsToKeep = saveAllCards($trello, $conn, $board, $cardOptions);
+
+      $cardsToKeep .= empty($cardsToKeep)? $partialCardsToKeep : ','.$partialCardsToKeep;
 }
 
 // A simple check, if $cardsToKeep is empty, something probably went wrong
@@ -58,7 +61,7 @@ if ($cardsToKeep != '')  {
 // Removing all cards no longer in Trello
 $strSQL = "DELETE FROM card WHERE id NOT IN ($cardsToKeep)";
 
-$conn->query($strSQL);
+//$conn->query($strSQL);
 }
 
 $conn->close();
@@ -127,7 +130,7 @@ function saveLists($lists, $conn) {
    @return string
 */
 function saveAllCards($trello, $conn, $board, $cardOptions) {
-
+      $cardsToKeep = '';
       $cards = $trello->get('boards/'.$board->id.'/cards', $cardOptions);
 
       // We will continue to pull cards as long as there are more than the limit
