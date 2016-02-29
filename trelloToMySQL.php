@@ -52,16 +52,16 @@ foreach ($me->idBoards as $boardId) {
 
 
       $partialCardsToKeep = saveAllCards($trello, $conn, $board, $cardOptions);
-
-      $cardsToKeep .= empty($cardsToKeep)? $partialCardsToKeep : ','.$partialCardsToKeep;
+      if ($partialCardsToKeep != '') {
+          $cardsToKeep .= empty($cardsToKeep)? $partialCardsToKeep : ','.$partialCardsToKeep;
+      }
 }
 
 // A simple check, if $cardsToKeep is empty, something probably went wrong
 if ($cardsToKeep != '')  {
-// Removing all cards no longer in Trello
-$strSQL = "DELETE FROM card WHERE id NOT IN ($cardsToKeep)";
-
-//$conn->query($strSQL);
+    // Removing all cards no longer in Trello
+    $strSQL = "DELETE FROM card WHERE id NOT IN ($cardsToKeep)";
+    $conn->query($strSQL);
 }
 
 $conn->close();
