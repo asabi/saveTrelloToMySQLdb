@@ -89,4 +89,15 @@ CREATE TABLE `list` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+DROP TABLE IF EXISTS `cardAction`;
+CREATE TABLE `cardAction` (
+  `id` varchar(255) NOT NULL,
+  `idCard` varchar(255) DEFAULT NULL,
+  `data` longtext,
+  `type` varchar(255) DEFAULT NULL,
+  `date` datetime DEFAULT NULL,
+  `memberCreator` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
 SET FOREIGN_KEY_CHECKS = 1;

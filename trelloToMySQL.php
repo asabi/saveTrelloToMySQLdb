@@ -72,6 +72,7 @@ function saveBoard($board, $conn) {
   $stmt = $conn->prepare("REPLACE INTO board (id, closed, idOrganization, name, pinned, timeCreated) VALUES (?, ?, ?, ?, ?, ?)");
   $stmt->bind_param("ssssss", $id, $closed, $idOrganization, $name,$pinned, $timeCreated);
 
+
   $id = $board->id;
   $closed = $board->closed;
   $idOrganization = $board->idOrganization;
@@ -138,7 +139,7 @@ function saveAllCards($trello, $conn, $board, $cardOptions) {
       $continue = true;
 
       while ($continue) {
-        $cardsToKeepFromSave = saveFoundCards($cards, $conn);
+        $cardsToKeepFromSave = saveFoundCards($trello, $cards, $conn);
 
         if ($cardsToKeepFromSave!= '') {
           $cardsToKeep.= empty($cardsToKeep)? $cardsToKeepFromSave:','.$cardsToKeepFromSave;
@@ -159,16 +160,10 @@ function saveAllCards($trello, $conn, $board, $cardOptions) {
 
 }
 
-function saveFoundCards($cards, $conn) {
+function saveFoundCards($trello, $cards, $conn) {
   //id,closed, idBoard, name,pos, shortUrl,due,dateLastActivity,desc,idList,labels
   $cardsToKeep = '';
   $stmt = $conn->prepare("REPLACE INTO card (id, closed, idBoard, name, pos,shortUrl,due,dateLastActivity,`desc`, idList,labels, timeCreated) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?)");
-
-  if ( !$stmt ) {
-      echo 'Error:'.$mysqli->error;
-      die;
-  }
-
   $stmt->bind_param("ssssssssssss", $id, $closed, $idBoard, $name,$pos, $shortUrl, $due, $dateLastActivity,$desc,$idList,$labels,$timeCreated);
 
   foreach ($cards as $object) {
@@ -197,6 +192,36 @@ function saveFoundCards($cards, $conn) {
     //echo $object->id.','.$object->timeCreated."\n";
   }
   $stmt->close();
+
+    // --- Actions for the above cards
+
+    $stmtAction = $conn->prepare("REPLACE INTO cardAction (id, idCard, data, type, date,memberCreator) VALUES (?, ?, ?, ?, ?, ?)");
+
+
+
+    foreach ($cards as $object) {
+        $id = $object->id;
+
+        $cardActions = $trello->get('cards/' . $id . '/actions');
+
+        if (sizeof($cardActions)) {
+
+            foreach ($cardActions as $cardAction) {
+                $idAction = $cardAction->id;
+                $data = json_encode($cardAction->data);
+                $type = $cardAction->type;
+                $date = $cardAction->date;
+                $memberCreator = json_encode($cardAction->memberCreator);
+                $stmtAction->bind_param("ssssss", $idAction, $id, $data, $type, $date, $memberCreator);
+
+                $stmtAction->execute();
+            }
+
+        }
+    }
+
+
+    $stmtAction->close();
 
   return $cardsToKeep;
 }
