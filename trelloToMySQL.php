@@ -1,4 +1,8 @@
 <?php
+date_default_timezone_set('America/Vancouver');
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 require __DIR__ . '/vendor/autoload.php';
 date_default_timezone_set('America/Vancouver');
 error_reporting(0);
@@ -197,12 +201,13 @@ function saveFoundCards($trello, $cards, $conn) {
 
     $stmtAction = $conn->prepare("REPLACE INTO cardAction (id, idCard, data, type, date,memberCreator) VALUES (?, ?, ?, ?, ?, ?)");
 
-
+    $cardActionOptions = array();
+    $cardActionOptions['filter'] = 'all';
 
     foreach ($cards as $object) {
         $id = $object->id;
 
-        $cardActions = $trello->get('cards/' . $id . '/actions');
+        $cardActions = $trello->get('cards/' . $id . '/actions', $cardActionOptions);
 
         if (sizeof($cardActions)) {
 
