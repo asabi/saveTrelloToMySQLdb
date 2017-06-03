@@ -1,0 +1,61 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "91180e9964673a9eccf42f295e4ede33",
+    "packages": [
+        {
+            "name": "mattzuba/php-trello",
+            "version": "v1.1.2",
+            "source": {
+                "type": "hg",
+                "url": "https://bitbucket.org/mattzuba/php-trello",
+                "reference": "3886ca25dbf0237d055dc9c8e6a79741534d7bb0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://bitbucket.org/mattzuba/php-trello/get/3886ca25dbf0237d055dc9c8e6a79741534d7bb0.zip",
+                "reference": "3886ca25dbf0237d055dc9c8e6a79741534d7bb0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Trello\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MPL-2.0-no-copyleft-exception"
+            ],
+            "authors": [
+                {
+                    "name": "Matt Zuba",
+                    "email": "matt.zuba@gmail.com",
+                    "homepage": "http://www.mattzuba.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "PHP-based Trello API Wrapper",
+            "homepage": "http://mattzuba.bitbucket.org/php-trello/",
+            "keywords": [
+                "api",
+                "trello"
+            ],
+            "time": "2014-09-10T21:30:30+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}

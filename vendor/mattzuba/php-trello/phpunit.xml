@@ -1,0 +1,7 @@
+<phpunit bootstrap="./tests/bootstrap.php" colors="true" stopOnFailure="True" stopOnError="true">
+    <testsuites>
+        <testsuite name="php-trello Tests">
+            <directory>./tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

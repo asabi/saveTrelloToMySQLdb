@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="php-trello" default="make">
+
+    <property name="package"  value="${phing.project.name}" override="true" />
+    <property name="builddir" value="./build" override="true" />
+    <property name="version" value="" override="true" />
+    <property name="hgParent" value="" />
+
+    <target name="test">
+        <phpunit printsummary="true" configuration="phpunit.xml">
+          <batchtest>
+            <fileset dir="tests">
+              <include name="*Test.php"/>
+            </fileset>
+          </batchtest>
+          <formatter type="plain" usefile="false" />
+        </phpunit>
+    </target>
+
+    <target name="prepare">
+        <echo msg="Making directory ${builddir}" />
+        <mkdir dir="${builddir}" />
+    </target>
+
+    <target name="build" depends="prepare">
+        <exec command="hg log -r 'max(tagged())' --template '{tags}'" outputProperty="version" />
+        <exec command="hg parents --template '{node}'" outputProperty="hgParent" />
+        <exec command="hg update -r 'max(tagged())'" />
+
+        <echo msg="Performing lint test..." />
+        <phplint haltonfailure="true" cachefile="${builddir}/lint.cache">
+          <fileset dir="src">
+            <include name="**/*.php"/>
+          </fileset>
+        </phplint>
+        <echo msg="Lint test successful..." />
+
+        <echo msg="Copying files to build directory..." />
+        <copy todir="${builddir}">
+            <fileset dir="./src">
+                <include name="Trello/*" />
+            </fileset>
+            <filelist dir="." files="README.md,LICENSE" />
+        </copy>
+        <exec command="hg up ${hgParent}" />
+    </target>
+
+    <target name="make" depends="test,build">
+        <echo msg="Creating archive..." />
+
+        <tar destfile="${builddir}/${package}-${version}.tar.gz" compression="gzip">
+            <fileset dir="${builddir}">
+                <include name="*" />
+            </fileset>
+        </tar>
+    </target>
+
+    <target name="clean">
+        <delete dir="${builddir}" />
+    </target>
+
+    <target name="rebuild">
+        <phingcall target="clean" />
+        <phingcall target="build" />
+    </target>
+
+</project>
