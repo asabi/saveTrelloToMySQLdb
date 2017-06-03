@@ -1,1 +1,1 @@
-/usr/bin/php /home/ec2-user/phpMySQLtoTrello/trelloToMySQL.php
+/usr/bin/php /home/ec2-user/scripts/trello2mysql/trelloToMySQL.php
